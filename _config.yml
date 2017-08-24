@@ -87,7 +87,7 @@ service-worker: true
 # Friends
 friends: [
     {
-    #     title: "Su",
-    #     href: "http://su.gallery/"
+         title: "博客园",
+         href: "http://www.cnblogs.com/pin-wang/"
      }
 ]
