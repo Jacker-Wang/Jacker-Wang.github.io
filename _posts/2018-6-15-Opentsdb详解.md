@@ -140,3 +140,37 @@ if __name__ == "__main__":
 ```
 
 2:进入Web界面查询相应的metric，看数据是否插入成功
+
+# Opentsdb在启用了Kerberos的hbase中的使用
+
+1 在opentsdb的配置文件 /usr/share/opentsdb/etc/opentsdb/optsdb.conf  中添加
+
+```
+hbase.security.auth.enable=true
+hbase.security.authentication=kerberos
+hbase.security.simple.username=hbase
+#注意！！！这只能使用_HOST
+hbase.kerberos.regionserver.principal=hbase/_HOST@AEP.COM
+hbase.regionserver.kerberos.password=hbase
+hbase.sasl.clientconfig=Client
+```
+
+2  添加文件  /usr/share/opentsdb/etc/opentsdb/jaas.conf配置文件如下
+
+```
+Client {
+  com.sun.security.auth.module.Krb5LoginModule required
+  useKeyTab=true
+  useTicketCache=false
+  keyTab="/etc/security/keytabs/hbase.service.keytab"
+  principal="hbase/aep.s4.com@AEP.COM";
+};
+```
+3 在启动文件添加 JVMARGS 参数
+
+在 export  JVMARGS上一行添加如下：
+```
+ JVMARGS="${JVMARGS} -Dhbase.kerberos.regionserver.principal=hbase/aep.s4.com@AEP.COM  -Dhbase.regionserver.kerberos.password=hbase  -Dhbase.sasl.clientconfig=Client  -Djava.security.auth.login.config=/usr/share/opentsdb/etc/opentsdb/jaas.conf  -Dhbase.security.authentication=kerberos  -Dzookeeper.sasl.client=false"
+
+```
+将principal修改成自己的。
